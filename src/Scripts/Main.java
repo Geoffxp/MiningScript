@@ -1,18 +1,28 @@
 package Scripts;
 
-import Data.Location;
 import Tasks.BankTask;
+import Tasks.CurrentlyMiningTask;
 import Tasks.MiningTask;
 import Tasks.Traverse;
 import org.rspeer.script.ScriptCategory;
 import org.rspeer.script.ScriptMeta;
 import org.rspeer.script.task.TaskScript;
+import org.rspeer.ui.Log;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 @ScriptMeta(name = "MiningScript", desc = "My first script!", developer = "Reph3x", category = ScriptCategory.MINING)
 public class Main extends TaskScript {
 
-	//Toggling this boolean is what switches between copper and tin
+    private miningXPListener xpListener = new miningXPListener();
+
     public static boolean oreToggle = true;
+    public static long startingTime;
+    public static double currentTime;
+    public static int[] oreCount;
+
+    public static MiningGui gui = new MiningGui();
 
     public static void main(String[] args) {
 
@@ -20,30 +30,73 @@ public class Main extends TaskScript {
 
     @Override
     public void onStart() {
-        //Submit the tasks. Tasks on top have higher priority than tasks on bottom.
-        //If a tasks' validate function returns true, that tasks execute function will be
-        //ran on a loop while the validate function is still true.
-        //If a validate function is false, it moves on the the next task.
-        //If the final tasks' validate function is false, it tries the first again, so on.
-        //
-        //Top priority is banking. If our inventory is full, bank. no exceptions.
-        //Traverse next, If we are not at a mine area and our inventory isn't full,
-        //we are running to a mine.
-        //For mining, if we are at a mine and our inventory isn't full, we mining.
         submit(
             new BankTask(),
             new Traverse(),
-            new MiningTask()
+            new MiningTask(),
+            new CurrentlyMiningTask()
         );
+        startingTime = System.currentTimeMillis();
+        currentTime = 0;
+        oreCount = new int[4];
+        gui.setVisible(true);
     }
 
     @Override
     public void onStop() {
-
+        xpListener.close();
     }
 
-	//Hamdy function to easily flip the copper/tin ore toggle
     public static void toggleOre() {
         oreToggle = !oreToggle;
     }
+    public static void updateTime() {
+        currentTime = (System.currentTimeMillis() - startingTime)/(1000.0*60.0*60.0);
+        gui.timeRunning.setText("Time Running: "+truncate(currentTime+"", 2)+" hours");
+    }
+    public static void incrementOreCount(String message) {
+        if(message.contains("coal"))
+            oreCount[3]++;
+        if(message.contains("iron"))
+            oreCount[2]++;
+        if(message.contains("copper"))
+            oreCount[1]++;
+        if(message.contains("tin"))
+            oreCount[0]++;
+    }
+
+    public static void updateOreCount() {
+        int index = 0;
+        for(int ore : oreCount) {
+            if(ore != 0) {
+                String oreName = "error";
+                switch(index) {
+                    case 0:
+                        oreName = "Tin";
+                        break;
+                    case 1:
+                        oreName = "Copper";
+                        break;
+                    case 2:
+                        oreName = "Iron";
+                        break;
+                    case 3:
+                        oreName = "Coal";
+                        break;
+                }
+                gui.oreMined[index].setText(oreName+" mined: "+ore);
+                gui.add(gui.oreMined[index]);
+            }
+            index++;
+        }
+    }
+
+    static String truncate(String value, int places) {
+        return new BigDecimal(value)
+                .setScale(places, RoundingMode.DOWN)
+                .stripTrailingZeros()
+                .toString();
+    }
 }
+
+
