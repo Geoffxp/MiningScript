@@ -13,11 +13,13 @@ import org.rspeer.ui.Log;
 
 public class CurrentlyMiningTask extends Task {
 
-    private final int[] SPENT_ORE = {11390, 11391};
+    private static final int[] SPENT_ORE = {11390, 11391};
+    private static final int MINING_ANIMATION = 624;
 
     @Override
     public boolean validate() {
-        return Players.getLocal().isAnimating() && Players.getLocal().getAnimation() == 624;
+        return Players.getLocal().isAnimating()
+                && Players.getLocal().getAnimation() == MINING_ANIMATION;
     }
 
     @Override

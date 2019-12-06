@@ -1,13 +1,9 @@
 package Scripts;
 
-import Tasks.BankTask;
-import Tasks.CurrentlyMiningTask;
-import Tasks.MiningTask;
-import Tasks.Traverse;
+import Tasks.*;
 import org.rspeer.script.ScriptCategory;
 import org.rspeer.script.ScriptMeta;
 import org.rspeer.script.task.TaskScript;
-import org.rspeer.ui.Log;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -15,7 +11,7 @@ import java.math.RoundingMode;
 @ScriptMeta(name = "MiningScript", desc = "My first script!", developer = "Reph3x", category = ScriptCategory.MINING)
 public class Main extends TaskScript {
 
-    private miningXPListener xpListener = new miningXPListener();
+    private MiningChatListener xpListener = new MiningChatListener();
 
     public static boolean oreToggle = true;
     public static long startingTime;
@@ -31,6 +27,7 @@ public class Main extends TaskScript {
     @Override
     public void onStart() {
         submit(
+            new NoPickaxeTask(),
             new BankTask(),
             new Traverse(),
             new MiningTask(),
@@ -45,6 +42,7 @@ public class Main extends TaskScript {
     @Override
     public void onStop() {
         xpListener.close();
+        gui.setVisible(false);
     }
 
     public static void toggleOre() {
@@ -97,6 +95,11 @@ public class Main extends TaskScript {
                 .stripTrailingZeros()
                 .toString();
     }
+
+    public void closeScript() {
+        setStopping(true);
+    }
+
 }
 
 

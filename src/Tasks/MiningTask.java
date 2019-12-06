@@ -14,10 +14,10 @@ import org.rspeer.ui.Log;
 
 public class MiningTask extends Task {
 
-    public final static int[] COAL = {11366, 11367};
-    public final static int[] IRON = {11365, 11364};
-    public final static int[] COPPER = {10943, 11161};
-    public final static int[] TIN = {11360, 11361};
+    public static final int[] COAL = {11366, 11367};
+    public static final int[] IRON = {11365, 11364};
+    public static final int[] COPPER = {10943, 11161};
+    public static final int[] TIN = {11360, 11361};
 
     public static SceneObject currentCoal;
     public static SceneObject currentIron;
@@ -27,12 +27,21 @@ public class MiningTask extends Task {
     @Override
     public boolean validate() {
         if(Skills.getLevel(Skill.MINING) >= 30) {
-            return Location.coal_mine.getArea().contains(Players.getLocal().getPosition()) && !Inventory.isFull() && !Players.getLocal().isMoving() && !Players.getLocal().isAnimating();
+            return Location.coal_mine.getArea().contains(Players.getLocal().getPosition())
+                    && !Inventory.isFull()
+                    && !Players.getLocal().isMoving()
+                    && !Players.getLocal().isAnimating();
         }
         if(Skills.getLevel(Skill.MINING) >= 15 ) {
-            return Location.copper_tin_iron_mine.getArea().contains(Players.getLocal().getPosition()) && !Inventory.isFull() && !Players.getLocal().isMoving() && !Players.getLocal().isAnimating();
+            return Location.copper_tin_iron_mine.getArea().contains(Players.getLocal().getPosition())
+                    && !Inventory.isFull()
+                    && !Players.getLocal().isMoving()
+                    && !Players.getLocal().isAnimating();
         }
-        return Location.copper_tin_iron_mine.getArea().contains(Players.getLocal().getPosition()) && !Inventory.isFull() && !Players.getLocal().isMoving() && !Players.getLocal().isAnimating();
+        return Location.copper_tin_iron_mine.getArea().contains(Players.getLocal().getPosition())
+                && !Inventory.isFull()
+                && !Players.getLocal().isMoving()
+                && !Players.getLocal().isAnimating();
     }
 
     @Override
@@ -47,7 +56,7 @@ public class MiningTask extends Task {
             return wait;
         }
 
-        if (Skills.getLevel(Skill.MINING) >= 30 && Skills.getLevel(Skill.MINING) < 55) {
+        if (Skills.getLevel(Skill.MINING) >= 30 /*&& Skills.getLevel(Skill.MINING) < 55*/) {
             currentCoal = SceneObjects.getNearest(COAL);
             try {
                 currentCoal.interact("Mine");
